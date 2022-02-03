@@ -1,0 +1,70 @@
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include"teacher.h"
+#include"student.h"
+QT_BEGIN_NAMESPACE
+namespace Ui { class Widget; }
+QT_END_NAMESPACE
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Widget(QWidget *parent = nullptr);
+    ~Widget();
+    Teacher *tc;
+    Student *st;
+    void classisover();
+private:
+    Ui::Widget *ui;
+};
+#endif // WIDGET_H
+#include "widget.h"
+#include "ui_widget.h"
+#include<QPushButton>
+#include<QtDebug>
+#include<wiget2.h>
+Widget::Widget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+    this->tc=new Teacher(this);
+    this->st=new Student(this);
+    connect(tc,&Teacher::hungry,st,&Student::treat);
+    //connect(tc,SIGNAL(hungry()),st,SLOT(treat()));
+    classisover();
+   // st->treat();
+    QPushButton *btn=new QPushButton("close",this);
+       QPushButton *btn2=new QPushButton("上课",this);
+  //  btn->show();
+    btn->move(200,200);
+    btn->resize(100,100);
+    connect(btn,&QPushButton::clicked,tc,&Teacher::hungry);
+  //  disconnect(btn,&QPushButton::clicked,tc,&Teacher::hungry);
+ //   connect(btn,&QPushButton::clicked,this,Widget::close);//信号连接信号
+    //clicked 参数返回bool，如果&Teacher::hungry中参数是QString,就会报错
+    //多信号对于单槽函数，多槽函数对于单信号
+    //参数类型必须对应，信号参数个数可以更多 QString->Qstring 可以，int string->string int不可以
+    //int int ->int 可以
+    [btn](){btn->setText("asd");}();
+    int a=3;
+    connect(btn,&QPushButton::clicked,this,[a]()mutable{a=20;qDebug()<<a;});
+    connect(btn2,&QPushButton::clicked,this,[=](){qDebug()<<a;});
+//    connect(btn,&QPushButton::clicked,this,[this](){this->close();st->treat();});
+    connect(btn,&QPushButton::clicked,this,[=](){btn->setText("dsssdad");});
+    connect(btn,&QPushButton::clicked,this,[=](){    wiget2 *w2=new wiget2();
+        w2->show();
+        w2->setWindowTitle("123");});
+};
+void Widget::classisover(){
+    emit tc->hungry();
+}
+Widget::~Widget()
+{
+    delete ui;
+}
+
